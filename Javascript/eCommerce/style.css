@@ -48,8 +48,8 @@ body {
 }
 
 .product-card button {
-    background-color: #ff5722;
-    color: #fff;
+    background-color: #ffffff;
+    color: #000000;
     border: none;
     padding: 10px 20px;
     cursor: pointer;
@@ -59,7 +59,62 @@ body {
 }
 
 .product-card button:hover {
-    background-color: #e64a19;
+    transition: all 0.5s;
+    background-color: #257443;
 }
 
+.cart-btn{
+    position: fixed;
+    top: 90vh;
+    right: 40px;
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 50%;
+    height: 24px;
+    width: 24px;
+    transition: transform 0.2s ease-in-out;
+}
 
+.cart-btn:hover {
+    cursor: pointer;
+    opacity: 0.9;
+}
+
+/*Modal*/
+
+.modal-overlay {
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: none; /* Oculto por defecto */
+}
+
+.modal-container {
+    display: none; /* Oculto por defecto */
+    
+    background-color: #ffffff;
+    box-shadow:  0px 2px 6px #00000029;
+    z-index: 1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #1e1e1e;
+    padding: 40px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.modal-close{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 24px;
+    color: #ff0000;
+}

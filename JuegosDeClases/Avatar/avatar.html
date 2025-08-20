@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/styles.css">
+    <title>LA LEYENDA DE AANG</title>
+</head>
+<body>
+    <div class="particles"></div>
+    
+    <div class="container">
+        <h1>🔥 AVATAR: THE LEGEND 🌊</h1>
+
+        <section id="seleccionar-personaje" class="fade-in">
+            <h2>Elige tu Maestro Elemental</h2>
+            
+            <div class="personajes-grid">
+                <div class="personaje-option" data-personaje="Zuko">
+                    <input type="radio" name="personaje" id="zuko" value="Zuko"/>
+                    <label for="zuko">
+                        <span class="personaje-emoji">🔥</span>
+                        <strong>Zuko</strong><br>
+                        <small>Maestro Fuego</small>
+                    </label>
+                </div>
+
+                <div class="personaje-option" data-personaje="Katara">
+                    <input type="radio" name="personaje" id="katara" value="Katara"/>
+                    <label for="katara">
+                        <span class="personaje-emoji">🌊</span>
+                        <strong>Katara</strong><br>
+                        <small>Maestra Agua</small>
+                    </label>
+                </div>
+
+                <div class="personaje-option" data-personaje="Aang">
+                    <input type="radio" name="personaje" id="aang" value="Aang"/>
+                    <label for="aang">
+                        <span class="personaje-emoji">💨</span>
+                        <strong>Aang</strong><br>
+                        <small>Maestro Aire</small>
+                    </label>
+                </div>
+
+                <div class="personaje-option" data-personaje="Toph">
+                    <input type="radio" name="personaje" id="toph" value="Toph"/>
+                    <label for="toph">
+                        <span class="personaje-emoji">🪨</span>
+                        <strong>Toph</strong><br>
+                        <small>Maestra Tierra</small>
+                    </label>
+                </div>
+            </div>
+
+            <button id="boton-personaje">⚡ Comenzar Batalla</button>
+        </section>
+
+        <section id="seleccionar-ataque" class="oculto">
+            <h2>⚔️ Campo de Batalla</h2>
+            
+            <div class="vidas-container">
+                <div class="vida-card vida-jugador">
+                    <div class="personaje-avatar" id="avatar-jugador"></div>
+                    <div id="personaje-jugador-nombre"></div>
+                    <div class="vida-numero" id="vidas-jugador">3</div>
+                    <div>Vidas Restantes</div>
+                </div>
+                
+                <div class="vs-text">VS</div>
+                
+                <div class="vida-card vida-enemigo">
+                    <div class="personaje-avatar" id="avatar-enemigo"></div>
+                    <div id="personaje-enemigo-nombre"></div>
+                    <div class="vida-numero" id="vidas-enemigo">3</div>
+                    <div>Vidas Restantes</div>
+                </div>
+            </div>
+            
+            <h3>Selecciona tu Elemento:</h3>
+            <div class="ataques-grid">
+                <button id="boton-fuego" class="boton-fuego">
+                    <span class="emoji-attack">🔥</span>Fuego
+                </button>
+                <button id="boton-agua" class="boton-agua">
+                    <span class="emoji-attack">🌊</span>Agua
+                </button>
+                <button id="boton-tierra" class="boton-tierra">
+                    <span class="emoji-attack">🪨</span>Tierra
+                </button>
+                <button id="boton-aire" class="boton-aire">
+                    <span class="emoji-attack">💨</span>Aire
+                </button>
+            </div>
+        </section>
+
+        <section id="mensajes" class="oculto">
+            <h3>📜 Crónicas de Batalla</h3>
+            <div id="resultado-combate"></div>
+        </section>
+
+        <section id="reiniciar" class="oculto">
+            <button id="boton-reiniciar">🔄 Nueva Batalla Épica</button>
+        </section>
+    </div>
+
+    <script>
+        // Variables globales del juego
+        let vidasJugador = 3;
+        let vidasEnemigo = 3;
+        let personajeJugador = "";
+        let personajeEnemigo = "";
+        let juegoTerminado = false;
+
+        // Elementos del DOM
+        const seccionSeleccionarPersonaje = document.getElementById('seleccionar-personaje');
+        const seccionSeleccionarAtaque = document.getElementById('seleccionar-ataque');
+        const seccionMensajes = document.getElementById('mensajes');
+        const seccionReiniciar = document.getElementById('reiniciar');
+
+        // Mecánica de combate - piedra, papel, tijera con elementos
+        const elementos = {
+            'Fuego': { vence: 'Aire', pierde: 'Agua' },
+            'Agua': { vence: 'Fuego', pierde: 'Tierra' },
+            'Tierra': { vence: 'Agua', pierde: 'Aire' },
+            'Aire': { vence: 'Tierra', pierde: 'Fuego' }
+        };
+
+        // Crear partículas flotantes
+        function crearParticulas() {
+            const particles = document.querySelector('.particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particles.appendChild(particle);
+            }
+        }
+
+        // Manejar selección visual de personajes
+        document.querySelectorAll('.personaje-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.personaje-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                this.querySelector('input[type="radio"]').checked = true;
+            });
+        });
+
+        function seleccionarPersonajeEnemigo() {
+            const personajes = [
+                { nombre: "Zuko", emoji: "🔥", elemento: "Fuego" },
+                { nombre: "Katara", emoji: "🌊", elemento: "Agua" },
+                { nombre: "Aang", emoji: "💨", elemento: "Aire" },
+                { nombre: "Toph", emoji: "🪨", elemento: "Tierra" }
+            ];
+            const numeroAleatorio = Math.floor(Math.random() * personajes.length);
+            const enemigo = personajes[numeroAleatorio];
+            
+            personajeEnemigo = `${enemigo.emoji} ${enemigo.nombre} (${enemigo.elemento})`;
+            
+            document.getElementById('avatar-enemigo').textContent = enemigo.emoji;
+            document.getElementById('personaje-enemigo-nombre').innerHTML = `<strong>${enemigo.nombre}</strong><br><small>Maestro ${enemigo.elemento}</small>`;
+        }
+
+        function seleccionarPersonajeJugador() {
+            let personajeSeleccionado = "";
+            let spanPersonajeJugador = document.getElementById('personaje-jugador');
+
+            if (document.getElementById('zuko').checked) {
+                personajeSeleccionado = "Zuko (Fuego)";
+            } else if (document.getElementById('katara').checked) {
+                personajeSeleccionado = "Katara (Agua)";
+            } else if (document.getElementById('aang').checked) {
+                personajeSeleccionado = "Aang (Aire)";
+            } else if (document.getElementById('toph').checked) {
+                personajeSeleccionado = "Toph (Tierra)";
+            } else {
+                alert("Por favor, selecciona un personaje");
+                return;
+            }
+
+            const emojis = { 'Zuko': '🔥', 'Katara': '🌊', 'Aang': '💨', 'Toph': '🪨' };
+            const elementos = { 'Zuko': 'Fuego', 'Katara': 'Agua', 'Aang': 'Aire', 'Toph': 'Tierra' };
+            const nombrePersonaje = personajeSeleccionado.split(' ')[0];
+            
+            personajeJugador = `${emojis[nombrePersonaje]} ${personajeSeleccionado}`;
+            
+            document.getElementById('avatar-jugador').textContent = emojis[nombrePersonaje];
+            document.getElementById('personaje-jugador-nombre').innerHTML = `<strong>${nombrePersonaje}</strong><br><small>Maestro ${elementos[nombrePersonaje]}</small>`;
+            
+            alert("Has seleccionado a " + personajeSeleccionado);
+            
+            // Elegir personaje enemigo
+            seleccionarPersonajeEnemigo();
+            iniciarJuego();
+        }
+
+        function iniciarJuego() {
+            seccionSeleccionarPersonaje.classList.add('oculto');
+            seccionSeleccionarAtaque.classList.remove('oculto');
+            seccionSeleccionarAtaque.classList.add('fade-in');
+            seccionMensajes.classList.remove('oculto');
+            seccionMensajes.classList.add('fade-in');
+            seccionReiniciar.classList.remove('oculto');
+            seccionReiniciar.classList.add('fade-in');
+        }
+
+        function atacar(ataqueJugador) {
+            if (juegoTerminado) return;
+
+            const ataques = ['Fuego', 'Agua', 'Tierra', 'Aire'];
+            const ataqueEnemigo = ataques[Math.floor(Math.random() * ataques.length)];
+
+            let resultado = combate(ataqueJugador, ataqueEnemigo);
+            mostrarResultado(ataqueJugador, ataqueEnemigo, resultado);
+
+            if (resultado === 'jugador') {
+                vidasEnemigo--;
+            } else if (resultado === 'enemigo') {
+                vidasJugador--;
+            }
+
+            actualizarVidas();
+            verificarFinJuego();
+        }
+
+        function combate(ataqueJugador, ataqueEnemigo) {
+            if (ataqueJugador === ataqueEnemigo) {
+                return 'empate';
+            } else if (elementos[ataqueJugador].vence === ataqueEnemigo) {
+                return 'jugador';
+            } else {
+                return 'enemigo';
+            }
+        }
+
+        function mostrarResultado(ataqueJugador, ataqueEnemigo, resultado) {
+            const emojisAtaque = { 'Fuego': '🔥', 'Agua': '🌊', 'Tierra': '🪨', 'Aire': '💨' };
+            let mensaje = `<div class="mensaje">`;
+            
+            mensaje += `<strong>Tu Ataque:</strong> ${emojisAtaque[ataqueJugador]} ${ataqueJugador} <span class="vs-text">VS</span> `;
+            mensaje += `<strong>Ataque Enemigo:</strong> ${emojisAtaque[ataqueEnemigo]} ${ataqueEnemigo}<br><br>`;
+
+            if (resultado === 'empate') {
+                mensaje += `<strong style="color: #ffd700;">⚖️ ¡Empate Perfecto! Ambos dominan ${ataqueJugador}</strong>`;
+            } else if (resultado === 'jugador') {
+                mensaje += `<strong style="color: #2ed573;">🏆 ¡Victoria! ${ataqueJugador} domina sobre ${ataqueEnemigo}</strong>`;
+            } else {
+                mensaje += `<strong style="color: #ff4757;">💥 Derrota. ${ataqueEnemigo} supera a ${ataqueJugador}</strong>`;
+            }
+            
+            mensaje += `</div>`;
+            
+            document.getElementById('resultado-combate').innerHTML = mensaje + document.getElementById('resultado-combate').innerHTML;
+        }
+
+        function actualizarVidas() {
+            document.getElementById('vidas-jugador').textContent = vidasJugador;
+            document.getElementById('vidas-enemigo').textContent = vidasEnemigo;
+        }
+
+        function verificarFinJuego() {
+            if (vidasJugador === 0) {
+                juegoTerminado = true;
+                document.getElementById('resultado-combate').innerHTML = 
+                    `<div class="ganador">💀 ¡DERROTA ÉPICA! 💀<br>El enemigo ha conquistado los elementos.<br>🌪️ ¡Entrena más para la próxima batalla! 🌪️</div>` + 
+                    document.getElementById('resultado-combate').innerHTML;
+            } else if (vidasEnemigo === 0) {
+                juegoTerminado = true;
+                document.getElementById('resultado-combate').innerHTML = 
+                    `<div class="ganador">🏆 ¡VICTORIA LEGENDARIA! 🏆<br>¡Eres el Avatar Supremo!<br>⚡ ¡Has dominado todos los elementos! ⚡</div>` + 
+                    document.getElementById('resultado-combate').innerHTML;
+            }
+        }
+
+        function reiniciarJuego() {
+            vidasJugador = 3;
+            vidasEnemigo = 3;
+            juegoTerminado = false;
+            personajeJugador = "";
+            personajeEnemigo = "";
+
+            // Limpiar selección de personajes
+            const radios = document.querySelectorAll('input[name="personaje"]');
+            radios.forEach(radio => {
+                radio.checked = false;
+            });
+            document.querySelectorAll('.personaje-option').forEach(opt => opt.classList.remove('selected'));
+
+            // Limpiar mensajes
+            document.getElementById('resultado-combate').innerHTML = '';
+            document.getElementById('avatar-jugador').textContent = '';
+            document.getElementById('avatar-enemigo').textContent = '';
+            document.getElementById('personaje-jugador-nombre').innerHTML = '';
+            document.getElementById('personaje-enemigo-nombre').innerHTML = '';
+
+            // Mostrar sección de selección de personaje
+            seccionSeleccionarPersonaje.classList.remove('oculto');
+            seccionSeleccionarAtaque.classList.add('oculto');
+            seccionMensajes.classList.add('oculto');
+            seccionReiniciar.classList.add('oculto');
+
+            // Actualizar vidas en la interfaz
+            actualizarVidas();
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            crearParticulas();
+
+            // Botón de selección de personaje
+            document.getElementById('boton-personaje').addEventListener('click', seleccionarPersonajeJugador);
+
+            // Botones de ataque
+            document.getElementById('boton-fuego').addEventListener('click', () => atacar('Fuego'));
+            document.getElementById('boton-agua').addEventListener('click', () => atacar('Agua'));
+            document.getElementById('boton-tierra').addEventListener('click', () => atacar('Tierra'));
+            document.getElementById('boton-aire').addEventListener('click', () => atacar('Aire'));
+
+            // Botón de reinicio
+            document.getElementById('boton-reiniciar').addEventListener('click', reiniciarJuego);
+        });
+    </script>
+</body>
+</html>

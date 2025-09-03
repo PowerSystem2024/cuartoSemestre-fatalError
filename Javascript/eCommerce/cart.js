@@ -1,12 +1,7 @@
 ﻿const modalContainer = document.getElementById("modal-container");
 const modalOverlay = document.getElementById("modal-overlay");
 const cartBtn = document.getElementById("cart-btn");
-
-// ejemplo de carrito - comentario restaurado
-// const cart = [
-//     { productName: "Producto 1", price: 10, quanty: 1, img: "remera1.jpg" },
-//     { productName: "Producto 2", price: 20, quanty: 2, img: "remera2.jpg" }
-// ];
+const cartCounter = document.getElementById("cart-counter");
 
 const displayCart = () => {
     modalContainer.innerHTML = "";
@@ -19,6 +14,7 @@ const displayCart = () => {
 
     const modalClose = document.createElement("div");
     modalClose.className = "modal-close";
+    modalClose.innerText = "✖"; 
     modalClose.addEventListener("click", () => {
         modalContainer.style.display = "none";
         modalOverlay.style.display = "none";
@@ -28,57 +24,62 @@ const displayCart = () => {
     modalTitle.className = "modal-title";
     modalTitle.innerText = "Carrito";
 
-    modalHeader.append(modalClose, modalTitle);
+    modalHeader.append(modalTitle, modalClose);
     modalContainer.append(modalHeader);
 
     // BODY
-    cart.forEach((product) => {
-        const modalBody = document.createElement("div");
-        modalBody.className = "modal-body";
-        modalBody.innerHTML = `
-            <div class="product">
-                <img class="product-img" src="${product.img}" alt="${product.productName}" />
-                <div class="product-info">
-                    <h4>${product.productName}</h4>
+    if (cart.length > 0) {
+        cart.forEach((product) => {
+            const modalBody = document.createElement("div");
+            modalBody.className = "modal-body";
+            modalBody.innerHTML = `
+                <div class="product">
+                    <img class="product-img" src="${product.img}" alt="${product.productName}" />
+                    <div class="product-info">
+                        <h4>${product.productName}</h4>
+                    </div>
+                    <div class="quantity">
+                        <span class="quantity-btn-decrease">-</span>
+                        <span class="quantity-input">${product.quanty}</span>
+                        <span class="quantity-btn-increase">+</span>
+                    </div>
+                    <div class="price">${(product.price * product.quanty).toFixed(2)} $</div>
+                    <div class="delete-product">X</div>
                 </div>
-                <div class="quantity">
-                    <span class="quantity-btn-decrease">-</span>
-                    <span class="quantity-input">${product.quanty}</span>
-                    <span class="quantity-btn-increase">+</span>
-                </div>
-                <div class="price">${product.price * product.quanty} $</div>
-                <div class="delete-product">X</div>
-            </div>
-        `;
-        modalContainer.append(modalBody);
+            `;
+            modalContainer.append(modalBody);
 
-        const decrease = modalBody.querySelector(".quantity-btn-decrease");
-        const increase = modalBody.querySelector(".quantity-btn-increase");
+            const decrease = modalBody.querySelector(".quantity-btn-decrease");
+            const increase = modalBody.querySelector(".quantity-btn-increase");
 
-        decrease.addEventListener("click", () => {
-            if (product.quanty > 1) product.quanty--;
-            displayCart();
+            decrease.addEventListener("click", () => {
+                if (product.quanty > 1) product.quanty--;
+                updateCart(); 
+            });
+
+            increase.addEventListener("click", () => {
+                product.quanty++;
+                updateCart(); 
+            });
+
+            const deleteButton = modalBody.querySelector(".delete-product");
+            deleteButton.addEventListener("click", () => {
+                deleteCartProduct(product.id);
+            });
         });
 
-        increase.addEventListener("click", () => {
-            product.quanty++;
-            displayCart();
-        });
-
-        //DELETE boton
-        const deleteButton = modalBody.querySelector(".delete-product");
-
-        deleteButton.addEventListener("click", () => {
-            deleteCartProduct(product.id);
-        });
-    });
-
-    //modal fotter
-    const total = cart.reduce((acc, el) => acc + el.price * el.quanty, 0);
-    const modalFooter = document.createElement("div");
-    modalFooter.className = "modal-footer";
-    modalFooter.innerHTML = `<div class="total-price">Total :) ${total} $</div>`;
-    modalContainer.append(modalFooter);
+        // FOOTER
+        const total = cart.reduce((acc, el) => acc + el.price * el.quanty, 0);
+        const modalFooter = document.createElement("div");
+        modalFooter.className = "modal-footer";
+        modalFooter.innerHTML = `<div class="total-price">Total: $${total.toFixed(2)}</div>`;
+        modalContainer.append(modalFooter);
+    } else {
+        const modalText = document.createElement("h2");
+        modalText.className = "modal-body";
+        modalText.innerText = "¡Tu carrito está vacío!";
+        modalContainer.append(modalText);
+    }
 };
 
 cartBtn.addEventListener("click", displayCart);
@@ -86,5 +87,20 @@ cartBtn.addEventListener("click", displayCart);
 const deleteCartProduct = (id) => {
     const foundId = cart.findIndex(element => element.id === id);
     cart.splice(foundId, 1);
+    updateCart();
+};
+
+const displayCartCounter = () => {
+    const cartLength = cart.reduce((acc, el) => acc + el.quanty, 0);
+    if (cartLength > 0) {
+        cartCounter.style.display = "block";
+        cartCounter.innerText = cartLength;
+    } else {
+        cartCounter.style.display = "none";
+    }
+};
+
+const updateCart = () => {
     displayCart();
-}
+    displayCartCounter();
+};

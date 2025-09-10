@@ -9,6 +9,9 @@
 <body>
     <div class="particles"></div>
     
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+    
     <div class="container">
         <h1>🔥 AVATAR: THE LEGEND 🌊</h1>
 
@@ -104,37 +107,84 @@
         </section>
     </div>
 <script>
-  // Configuración del juego centralizada, aca tenemos los datos del juego para poder reutulizarlos 
-     const CONFIG = {
-    vidasIniciales: 3,
-    totalParticulas: 50,
-    personajes: [
-        { id: 'zuko', nombre: 'Zuko', emoji: '🔥', elemento: 'Fuego' },
-        { id: 'katara', nombre: 'Katara', emoji: '🌊', elemento: 'Agua' },
-        { id: 'aang', nombre: 'Aang', emoji: '💨', elemento: 'Aire' },
-        { id: 'toph', nombre: 'Toph', emoji: '🪨', elemento: 'Tierra' }
-    ],
-    elementos: {
-        'Fuego': { vence: 'Aire', pierde: 'Agua' },
-        'Agua': { vence: 'Fuego', pierde: 'Tierra' },
-        'Tierra': { vence: 'Agua', pierde: 'Aire' },
-        'Aire': { vence: 'Tierra', pierde: 'Fuego' }
-    },
-    emojisAtaque: { 'Fuego': '🔥', 'Agua': '🌊', 'Tierra': '🪨', 'Aire': '💨' },
-    mensajes: {
-        empate: '⚖️ ¡Empate Perfecto! Ambos dominan',
-        victoria: '🏆 ¡Victoria!',
-        derrota: '💥 Derrota.',
-        ganadorJugador: '🏆 ¡VICTORIA LEGENDARIA! 🏆<br>¡Eres el Avatar Supremo!<br>⚡ ¡Has dominado todos los elementos! ⚡',
-        ganadorEnemigo: '💀 ¡DERROTA ÉPICA! 💀<br>El enemigo ha conquistado los elementos.<br>🌪️ ¡Entrena más para la próxima batalla! 🌪️'
+// APLICANDO POO - CLASE PERSONAJE (el molde para crear personajes)
+class Personaje {
+    constructor(id, nombre, emoji, elemento) {
+        // ATRIBUTOS del personaje
+        this.id = id;
+        this.nombre = nombre;
+        this.emoji = emoji;
+        this.elemento = elemento;
+        this.vidas = 3; // vidas iniciales
     }
- };
+    
+    // MÉTODOS (acciones que puede hacer el personaje)
+    atacar(elementoEnemigo) {
+        const ventajas = {
+            'Fuego': 'Aire',
+            'Agua': 'Fuego', 
+            'Tierra': 'Agua',
+            'Aire': 'Tierra'
+        };
+        
+        if (this.elemento === elementoEnemigo) return 'empate';
+        return ventajas[this.elemento] === elementoEnemigo ? 'victoria' : 'derrota';
+    }
+    
+    recibirDaño() {
+        this.vidas--;
+    }
+    
+    estaVivo() {
+        return this.vidas > 0;
+    }
+}
 
-//aca mejoramos el estado del juego separandolo 
-// Estado del juego
+// CLASE JUEGO - maneja toda la lógica del juego
+class JuegoAvatar {
+    constructor() {
+        // ATRIBUTOS del juego
+        this.vidasIniciales = 3;
+        this.totalParticulas = 50;
+        this.vidasJugador = 3;
+        this.vidasEnemigo = 3;
+        this.personajeJugador = null;
+        this.personajeEnemigo = null;
+        this.juegoTerminado = false;
+        
+        // Crear los personajes usando la clase
+        this.personajes = [
+            new Personaje('zuko', 'Zuko', '🔥', 'Fuego'),
+            new Personaje('katara', 'Katara', '🌊', 'Agua'),
+            new Personaje('aang', 'Aang', '💨', 'Aire'),
+            new Personaje('toph', 'Toph', '🪨', 'Tierra')
+        ];
+        
+        this.elementos = {
+            'Fuego': { vence: 'Aire', pierde: 'Agua' },
+            'Agua': { vence: 'Fuego', pierde: 'Tierra' },
+            'Tierra': { vence: 'Agua', pierde: 'Aire' },
+            'Aire': { vence: 'Tierra', pierde: 'Fuego' }
+        };
+        
+        this.emojisAtaque = { 'Fuego': '🔥', 'Agua': '🌊', 'Tierra': '🪨', 'Aire': '💨' };
+        this.mensajes = {
+            empate: '⚖️ ¡Empate Perfecto! Ambos dominan',
+            victoria: '🏆 ¡Victoria!',
+            derrota: '💥 Derrota.',
+            ganadorJugador: '🏆 ¡VICTORIA LEGENDARIA! 🏆<br>¡Eres el Avatar Supremo!<br>⚡ ¡Has dominado todos los elementos! ⚡',
+            ganadorEnemigo: '💀 ¡DERROTA ÉPICA! 💀<br>El enemigo ha conquistado los elementos.<br>🌪️ ¡Entrena más para la próxima batalla! 🌪️'
+        };
+    }
+}
+
+// Crear instancia del juego usando POO
+const juegoAvatar = new JuegoAvatar();
+
+// Estado del juego (mantener para compatibilidad)
 const estado = {
-    vidasJugador: CONFIG.vidasIniciales,
-    vidasEnemigo: CONFIG.vidasIniciales,
+    vidasJugador: juegoAvatar.vidasIniciales,
+    vidasEnemigo: juegoAvatar.vidasIniciales,
     personajeJugador: null,
     personajeEnemigo: null,
     juegoTerminado: false
@@ -161,7 +211,7 @@ const elementos = {
 const utils = {
     numeroAleatorio: (max) => Math.floor(Math.random() * max),
     
-    obtenerPersonajePorId: (id) => CONFIG.personajes.find(p => p.id === id),
+    obtenerPersonajePorId: (id) => juegoAvatar.personajes.find(p => p.id === id),
     
     obtenerPersonajeSeleccionado: () => {
         const radioSeleccionado = document.querySelector('input[name="personaje"]:checked');
@@ -187,6 +237,29 @@ const utils = {
     limpiarSeleccionPersonajes: () => {
         document.querySelectorAll('input[name="personaje"]').forEach(radio => radio.checked = false);
         document.querySelectorAll('.personaje-option').forEach(opt => opt.classList.remove('selected'));
+    },
+    
+    // Función para mostrar toast bonito
+    mostrarToast: (mensaje, tipo = 'info', icono = '🎮') => {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${tipo}`;
+        
+        toast.innerHTML = `
+            <span class="toast-icon">${icono}</span>
+            <span class="toast-message">${mensaje}</span>
+        `;
+        
+        container.appendChild(toast);
+        
+        // Mostrar toast con animación
+        setTimeout(() => toast.classList.add('show'), 100);
+        
+        // Ocultar y remover toast después de 3 segundos
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => container.removeChild(toast), 300);
+        }, 3000);
     }
 };
 
@@ -196,7 +269,7 @@ const juego = {
         const particles = document.querySelector('.particles');
         const fragment = document.createDocumentFragment();
         
-        for (let i = 0; i < CONFIG.totalParticulas; i++) {
+        for (let i = 0; i < juegoAvatar.totalParticulas; i++) {
             const particle = document.createElement('div');
             particle.className = 'particle';
             particle.style.left = Math.random() * 100 + '%';
@@ -208,7 +281,7 @@ const juego = {
     },
 
     seleccionarPersonajeEnemigo: () => {
-        const personajeAleatorio = CONFIG.personajes[utils.numeroAleatorio(CONFIG.personajes.length)];
+        const personajeAleatorio = juegoAvatar.personajes[utils.numeroAleatorio(juegoAvatar.personajes.length)];
         estado.personajeEnemigo = personajeAleatorio;
         utils.actualizarPersonajeUI(personajeAleatorio, elementos.avatarEnemigo, elementos.nombreEnemigo);
     },
@@ -217,14 +290,14 @@ const juego = {
         const personajeSeleccionado = utils.obtenerPersonajeSeleccionado();
         
         if (!personajeSeleccionado) {
-            alert("Por favor, selecciona un personaje");
+            utils.mostrarToast("Por favor, selecciona un personaje", "warning", "⚠️");
             return;
         }
 
         estado.personajeJugador = personajeSeleccionado;
         utils.actualizarPersonajeUI(personajeSeleccionado, elementos.avatarJugador, elementos.nombreJugador);
         
-        alert(`Has seleccionado a ${personajeSeleccionado.nombre}`);
+        utils.mostrarToast(`Has seleccionado a ${personajeSeleccionado.nombre} ${personajeSeleccionado.emoji}`, "success", "✅");
         
         juego.seleccionarPersonajeEnemigo();
         juego.iniciarJuego();
@@ -239,11 +312,11 @@ const juego = {
 
     combate: (ataqueJugador, ataqueEnemigo) => {
         if (ataqueJugador === ataqueEnemigo) return 'empate';
-        return CONFIG.elementos[ataqueJugador].vence === ataqueEnemigo ? 'jugador' : 'enemigo';
+        return juegoAvatar.elementos[ataqueJugador].vence === ataqueEnemigo ? 'jugador' : 'enemigo';
     },
 
     mostrarResultado: (ataqueJugador, ataqueEnemigo, resultado) => {
-        const { emojisAtaque, mensajes } = CONFIG;
+        const { emojisAtaque, mensajes } = juegoAvatar;
         let mensaje = `<div class="mensaje">`;
         
         mensaje += `<strong>Tu Ataque:</strong> ${emojisAtaque[ataqueJugador]} ${ataqueJugador} <span class="vs-text">VS</span> `;
@@ -271,7 +344,7 @@ const juego = {
     },
 
     verificarFinJuego: () => {
-        const { mensajes } = CONFIG;
+        const { mensajes } = juegoAvatar;
         let mensajeFinal = null;
 
         if (estado.vidasJugador === 0) {
@@ -290,7 +363,7 @@ const juego = {
     atacar: (ataqueJugador) => {
         if (estado.juegoTerminado) return;
 
-        const ataqueEnemigo = Object.keys(CONFIG.elementos)[utils.numeroAleatorio(4)];
+        const ataqueEnemigo = Object.keys(juegoAvatar.elementos)[utils.numeroAleatorio(4)];
         const resultado = juego.combate(ataqueJugador, ataqueEnemigo);
         
         juego.mostrarResultado(ataqueJugador, ataqueEnemigo, resultado);
@@ -309,8 +382,8 @@ const juego = {
     reiniciar: () => {
         // Resetear estado
         Object.assign(estado, {
-            vidasJugador: CONFIG.vidasIniciales,
-            vidasEnemigo: CONFIG.vidasIniciales,
+            vidasJugador: juegoAvatar.vidasIniciales,
+            vidasEnemigo: juegoAvatar.vidasIniciales,
             juegoTerminado: false,
             personajeJugador: null,
             personajeEnemigo: null

@@ -66,7 +66,7 @@
                 <div class="vida-card vida-jugador">
                     <div class="personaje-avatar" id="avatar-jugador"></div>
                     <div id="personaje-jugador-nombre"></div>
-                    <div class="vida-numero" id="vidas-jugador">3</div>
+                    <div class="vida-numero" id="vidas-jugador">5</div>
                     <div>Vidas Restantes</div>
                 </div>
                 
@@ -75,7 +75,7 @@
                 <div class="vida-card vida-enemigo">
                     <div class="personaje-avatar" id="avatar-enemigo"></div>
                     <div id="personaje-enemigo-nombre"></div>
-                    <div class="vida-numero" id="vidas-enemigo">3</div>
+                    <div class="vida-numero" id="vidas-enemigo">5</div>
                     <div>Vidas Restantes</div>
                 </div>
             </div>
@@ -107,18 +107,36 @@
         </section>
     </div>
 <script>
-// APLICANDO POO - CLASE PERSONAJE (el molde para crear personajes)
-class Personaje {
-    constructor(id, nombre, emoji, elemento) {
-        // ATRIBUTOS del personaje
-        this.id = id;
+// APLICANDO POO - CLASE AVATAR (el molde para crear personajes)
+class Avatar {
+    constructor(nombre, imagen, vidas) {
+        // ATRIBUTOS del Avatar - usando this para referenciar al objeto actual
         this.nombre = nombre;
-        this.emoji = emoji;
-        this.elemento = elemento;
-        this.vidas = 3; // vidas iniciales
+        this.imagen = imagen;
+        this.vidas = vidas;
+        this.vidasIniciales = vidas; // Guardamos las vidas originales
+        
+        // Determinamos el elemento según el nombre del personaje
+        if (nombre === 'Zuko') {
+            this.elemento = 'Fuego';
+            this.emoji = '🔥';
+            this.id = 'zuko';
+        } else if (nombre === 'Katara') {
+            this.elemento = 'Agua';
+            this.emoji = '🌊';
+            this.id = 'katara';
+        } else if (nombre === 'Aang') {
+            this.elemento = 'Aire';
+            this.emoji = '💨';
+            this.id = 'aang';
+        } else if (nombre === 'Toph') {
+            this.elemento = 'Tierra';
+            this.emoji = '🪨';
+            this.id = 'toph';
+        }
     }
     
-    // MÉTODOS (acciones que puede hacer el personaje)
+    // MÉTODOS (acciones que puede hacer el Avatar)
     atacar(elementoEnemigo) {
         const ventajas = {
             'Fuego': 'Aire',
@@ -138,27 +156,27 @@ class Personaje {
     estaVivo() {
         return this.vidas > 0;
     }
+    
+    // Método para resetear las vidas del Avatar
+    restaurarVidas() {
+        this.vidas = this.vidasIniciales;
+    }
 }
+
+// CREANDO EL ARRAY GLOBAL DE AVATARES (línea 26 como indica la tarea)
+let avatares = []; // Array vacío para almacenar los personajes
 
 // CLASE JUEGO - maneja toda la lógica del juego
 class JuegoAvatar {
     constructor() {
         // ATRIBUTOS del juego
-        this.vidasIniciales = 3;
+        this.vidasIniciales = 5; // Cambiamos a 5 como en el ejemplo de la tarea
         this.totalParticulas = 50;
-        this.vidasJugador = 3;
-        this.vidasEnemigo = 3;
+        this.vidasJugador = 5;
+        this.vidasEnemigo = 5;
         this.personajeJugador = null;
         this.personajeEnemigo = null;
         this.juegoTerminado = false;
-        
-        // Crear los personajes usando la clase
-        this.personajes = [
-            new Personaje('zuko', 'Zuko', '🔥', 'Fuego'),
-            new Personaje('katara', 'Katara', '🌊', 'Agua'),
-            new Personaje('aang', 'Aang', '💨', 'Aire'),
-            new Personaje('toph', 'Toph', '🪨', 'Tierra')
-        ];
         
         this.elementos = {
             'Fuego': { vence: 'Aire', pierde: 'Agua' },
@@ -177,6 +195,18 @@ class JuegoAvatar {
         };
     }
 }
+
+// INSTANCIANDO AVATARES - Creando objetos usando la palabra reservada 'new'
+// Ejemplo: let zuko = new Avatar('Zuko', './assets/Zuko.png', 5)
+let zuko = new Avatar('Zuko', './assets/Zuko.png', 5);
+let katara = new Avatar('Katara', './assets/Katara.png', 5);
+let aang = new Avatar('Aang', './assets/Aang.png', 5);
+let toph = new Avatar('Toph', './assets/Toph.png', 5);
+
+
+avatares.push(zuko, katara, aang, toph); // Usamos el método push para agregar elementos
+
+
 
 // Crear instancia del juego usando POO
 const juegoAvatar = new JuegoAvatar();
@@ -211,7 +241,7 @@ const elementos = {
 const utils = {
     numeroAleatorio: (max) => Math.floor(Math.random() * max),
     
-    obtenerPersonajePorId: (id) => juegoAvatar.personajes.find(p => p.id === id),
+    obtenerPersonajePorId: (id) => avatares.find(p => p.id === id),
     
     obtenerPersonajeSeleccionado: () => {
         const radioSeleccionado = document.querySelector('input[name="personaje"]:checked');
@@ -281,7 +311,8 @@ const juego = {
     },
 
     seleccionarPersonajeEnemigo: () => {
-        const personajeAleatorio = juegoAvatar.personajes[utils.numeroAleatorio(juegoAvatar.personajes.length)];
+        // Usamos el array avatares y su propiedad length para seleccionar aleatoriamente
+        const personajeAleatorio = avatares[utils.numeroAleatorio(avatares.length)];
         estado.personajeEnemigo = personajeAleatorio;
         utils.actualizarPersonajeUI(personajeAleatorio, elementos.avatarEnemigo, elementos.nombreEnemigo);
     },
@@ -380,6 +411,9 @@ const juego = {
     },
 
     reiniciar: () => {
+        // Restaurar vidas de todos los avatares usando el método de la clase
+        avatares.forEach(avatar => avatar.restaurarVidas());
+        
         // Resetear estado
         Object.assign(estado, {
             vidasJugador: juegoAvatar.vidasIniciales,
@@ -435,8 +469,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-//en conclucion mejoramos la estructura organizando los modulos logicos (config, estado, elementos, utils, juego), las funciones ahora son mas pequeñas y claras,
-// se lee mejor el codigo, los emojis y elementos ya no estan duplicados, tiene mejor rendimiento con cache DOM y menos busquedas.
+// FUNCIONES ADICIONALES PARA DEMOSTRAR ESCALABILIDAD
+
+// Función para agregar un nuevo Avatar al juego 
+function agregarNuevoAvatar(nombre, imagen, vidas) {
+    const nuevoAvatar = new Avatar(nombre, imagen, vidas);
+    avatares.push(nuevoAvatar); // Usamos push() para agregar al array
+    console.log(`Nuevo Avatar agregado: ${nombre}`);
+    console.log(`Total de avatares: ${avatares.length}`); // Usamos length
+    return nuevoAvatar;
+}
+
+// Función para mostrar información de todos los avatares
+function mostrarTodosLosAvatares() {
+    console.log('=== LISTA DE TODOS LOS AVATARES ===');
+    avatares.forEach((avatar, index) => {
+        console.log(`${index + 1}. ${avatar.nombre} - Elemento: ${avatar.elemento} - Vidas: ${avatar.vidas}/${avatar.vidasIniciales}`);
+    });
+}
+
+// Función para eliminar un avatar (usando pop())
+function eliminarUltimoAvatar() {
+    if (avatares.length > 0) {
+        const avatarEliminado = avatares.pop(); // Usamos pop() para extraer el último
+        console.log(`Avatar eliminado: ${avatarEliminado.nombre}`);
+        console.log(`Avatares restantes: ${avatares.length}`);
+        return avatarEliminado;
+    } else {
+        console.log('No hay avatares para eliminar');
+        return null;
+    }
+}
+
+
 
 </script>
 </body>

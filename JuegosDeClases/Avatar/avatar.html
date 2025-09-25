@@ -14,6 +14,36 @@
     
     <div class="container">
         <h1>🔥 AVATAR: THE LEGEND 🌊</h1>
+        
+        <div class="reglas-juego">
+            <h2>📜 REGLAS DEL JUEGO</h2>
+            <div class="reglas-content">
+                <div class="regla-item">
+                    <span class="regla-emoji">🎯</span>
+                    <div class="regla-text">
+                        <strong>Objetivo:</strong> Reduce las vidas del enemigo a 0 para ganar
+                    </div>
+                </div>
+                <div class="regla-item">
+                    <span class="regla-emoji">⚔️</span>
+                    <div class="regla-text">
+                        <strong>Combate:</strong> Elige un elemento (Fuego, Agua, Tierra, Aire) para atacar
+                    </div>
+                </div>
+                <div class="regla-item">
+                    <span class="regla-emoji">🔄</span>
+                    <div class="regla-text">
+                        <strong>Ventajas:</strong> Fuego > Aire | Agua > Fuego | Tierra > Agua | Aire > Tierra
+                    </div>
+                </div>
+                <div class="regla-item">
+                    <span class="regla-emoji">💫</span>
+                    <div class="regla-text">
+                        <strong>Empate:</strong> Si usas el mismo elemento que el enemigo, no hay daño
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <section id="seleccionar-personaje" class="fade-in">
             <h2>Elige tu Maestro Elemental</h2>
@@ -52,6 +82,24 @@
                         <span class="personaje-emoji">🌱</span>
                         <strong>Toph</strong><br>
                         <small>Maestra Tierra</small>
+                    </label>
+                </div>
+
+                <div class="personaje-option" data-personaje="Azula">
+                    <input type="radio" name="personaje" id="azula" value="Azula"/>
+                    <label for="azula">
+                        <span class="personaje-emoji">⚡</span>
+                        <strong>Azula</strong><br>
+                        <small>Maestra Fuego Azul</small>
+                    </label>
+                </div>
+
+                <div class="personaje-option" data-personaje="Iroh">
+                    <input type="radio" name="personaje" id="iroh" value="Iroh"/>
+                    <label for="iroh">
+                        <span class="personaje-emoji">🧘</span>
+                        <strong>Iroh</strong><br>
+                        <small>Maestro Fuego Sabio</small>
                     </label>
                 </div>
             </div>
@@ -133,6 +181,14 @@ class Avatar {
             this.elemento = 'Tierra';
             this.emoji = '🪨';
             this.id = 'toph';
+        } else if (nombre === 'Azula') {
+            this.elemento = 'Fuego';
+            this.emoji = '⚡';
+            this.id = 'azula';
+        } else if (nombre === 'Iroh') {
+            this.elemento = 'Fuego';
+            this.emoji = '🧘';
+            this.id = 'iroh';
         }
     }
     
@@ -202,9 +258,11 @@ let zuko = new Avatar('Zuko', './assets/Zuko.png', 5);
 let katara = new Avatar('Katara', './assets/Katara.png', 5);
 let aang = new Avatar('Aang', './assets/Aang.png', 5);
 let toph = new Avatar('Toph', './assets/Toph.png', 5);
+let azula = new Avatar('Azula', './assets/Azula.png', 5);
+let iroh = new Avatar('Iroh', './assets/Iroh.png', 5);
 
 
-avatares.push(zuko, katara, aang, toph); // Usamos el método push para agregar elementos
+avatares.push(zuko, katara, aang, toph, azula, iroh); // Usamos el método push para agregar elementos
 
 
 

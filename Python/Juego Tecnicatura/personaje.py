@@ -81,3 +81,4 @@ class Explosion:
     def dibujar(self, screen):
      # Dibuja la imagen en en la pantalla
      screen.blit(self.image, self.rect.topLeft)
+

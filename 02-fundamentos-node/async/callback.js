@@ -9,14 +9,33 @@ function soyAsincrona(mensaje,micallback){
 function adios(mensaje, otrocallback){
     setTimeout(function() {
         console.log('adios' + mensaje)
-        otrocallback('mensaje de otrocallback')
+        otrocallback()
     }, 1000)
 }
 
-console.log('inicio')
-soyAsincrona('mensaje de prueba',function(mensaje){
-    console.log(mensaje)
-})
-console.log('fin')
+// funcion recursiva
+function conversacion(Nombre, veces, callback){
+    if (veces > 0) {
+    hablar(function() {
+        conversacion(Nombre, --veces, callback);
+    });
+    } else {
+        callback(Nombre, callback);
+    }
+}
+
+
+//--proceso principal
+console.log('iniciando proceso')
+hola('luca',function(Nombre){
+  conversacion('luca', 3, function(){
+        console.log("Terminamos el proceso")
+    }); 
+});
+
+
+
+
+
 
 

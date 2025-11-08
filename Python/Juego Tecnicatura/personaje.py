@@ -27,14 +27,13 @@ class Personaje:
        return True
 
     def dibujar(self, screen):
-      screen.blit(self.image, self.shape.topleft)
-      for laser in self.lasers:
-         laser.dibujar(screen)
-         laser.mover()
-
-    # Dibujar la barra de energía
-    pygame.draw.rect(screen, (255, 0, 0), (10, 10, 100, 10))  # barra de fondo
-    pygame.draw.rect(screen, (0, 255, 0), (10, 10, self.energia, 10))  # barra de energía
+        screen.blit(self.image, self.shape.topleft)
+        # Dibujar la barra de energía
+        pygame.draw.rect(screen, (255, 0, 0), (10, 10, 100, 10))  # barra de fondo
+        pygame.draw.rect(screen, (0, 255, 0), (10, 10, self.energia, 10))  # barra de energía
+        for laser in self.lasers:
+            laser.dibujar(screen)
+            laser.mover()
 
 class Enemigo:
     def __init__(self, x, y):
@@ -42,7 +41,7 @@ class Enemigo:
         self.image = pygame.transform.scale(self.image, (80, 80))
         self.image = self.image.get_rect(TopLeft=(x, y))
 
-    def mover(self):
+    def mover(self, screen):
         screen.blit(self.image, self.rect.topLeft)
 
 
